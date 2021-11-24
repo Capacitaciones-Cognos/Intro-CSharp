@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test01-Introduccion-Cognos", "Test01-Introduccion-Cognos.csproj", "{A82B26B0-934C-4186-B86C-33AA5A3A7C89}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A82B26B0-934C-4186-B86C-33AA5A3A7C89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A82B26B0-934C-4186-B86C-33AA5A3A7C89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A82B26B0-934C-4186-B86C-33AA5A3A7C89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A82B26B0-934C-4186-B86C-33AA5A3A7C89}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B2DA1E02-0DF6-4727-9CE9-B19C1CE00183}
+	EndGlobalSection
+EndGlobal
