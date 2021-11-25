@@ -8,17 +8,15 @@ namespace Test01_Introduccion_Cognos
 {
     public class OrdenCarga
     {
-        public int IdOrdenCarga { get; internal set; }
-        public string FechaInicio { get; internal set; }
-        public string FechaFin { get; internal set; }
-        public double Honorarios { get; internal set; }
-        public int IdOperacion { get; internal set; }
-        public string Chofer { get; internal set; }
+        public int IdOrdenCarga { get; set; }
+        public string FechaInicio { get; set; }
+        public string FechaFin { get; set; }
+        public double Honorarios { get; set; }
+        public int IdOperacion { get; set; }
+        public string Chofer { get; set; }
 
-        public override string ToString()
-        {
-            return $"Id: {IdOrdenCarga}, Chofer: {Chofer} Fecha Inicio: {FechaInicio}, Fecha Fin: {FechaFin}, Honorarios: {Honorarios}";
-        }
+        public override string ToString() => $"Id: {IdOrdenCarga}, Chofer: {Chofer}, Fecha Inicio: {FechaInicio}, Fecha Fin: {FechaFin}, Honorarios: {Honorarios}, IdOperacion: {IdOperacion}";
+
 
     }
 }

@@ -6,4 +6,8 @@
     <RootNamespace>Test01_Introduccion_Cognos</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove=".gitignore" />
+  </ItemGroup>
+
 </Project>

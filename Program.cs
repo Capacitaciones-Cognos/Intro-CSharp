@@ -14,14 +14,27 @@ namespace Test01_Introduccion_Cognos
         static List<Operacion> Operaciones = new List<Operacion>();
         static List<OrdenCarga> OrdenesCarga = new List<OrdenCarga>();
 
+        private class OrdenCargaDTO
+        {
+            public int IdOperacion { get; set; }
+            public string Operacion { get; set; }
+            public double Flete { get; set; }
+            public string Empresa { get; set; }
+
+            public int IdOrdenCarga { get; set; }
+            public double Honorarios { get; set; }
+            public string NombreChofer { get; set; }
+
+            public override string ToString()
+            {
+                return $"IdOperacion: {IdOperacion}, Operacion: {Operacion}, Flete: {Flete}, Empresa: {Empresa}, IdOrdenCarga: {IdOrdenCarga}, Honorarios: {Honorarios}, NombreChofer: {NombreChofer}";
+            }
+        }
+
 
         /*static ListaGenerica<int> la = new ListaGenerica<int>();
         static ListaGenerica<string> l2 = new ListaGenerica<string>();
         static ListaGenerica<Operacion> lOpe = new ListaGenerica<Operacion>();*/
-
-
-
-
 
         static int opciones;
 
@@ -33,11 +46,9 @@ namespace Test01_Introduccion_Cognos
             l2.add("dsad");
             lOpe.add(new Operacion { Descripcion = "21", Destino = "asd" });*/
 
-
-
             do
             {
-                Console.WriteLine("Seleccione una de las siguiente opciones:\n\n1 => Registrar Operacion\n2 => Registrar Orden de Carga \n3 => Listar Operacion \n4 => Filtrar OPE por Ciudad LP \n5 => Eliminar Operacion con ID = 1\n0 => Salir de la aplicacion");
+                Console.WriteLine("Seleccione una de las siguiente opciones:\n\n1 => Registrar Operacion\n2 => Registrar Orden de Carga \n3 => Listar Operacion \n4 => Filtrar OPE por Ciudad Destino y Origen \n5 => Eliminar Operacion con ID \n6 => Listar las ordenes de carga \n7 => Consulta: Listar Ordenes de Carga junto con la Operacion a la que pertenece \n8 Obtener Orden de Carga Personalizada por ID \n0 => Salir de la aplicacion");
 
                 opciones = Convert.ToInt32(Console.ReadLine());
 
@@ -140,14 +151,95 @@ namespace Test01_Introduccion_Cognos
                         Console.WriteLine("==================================================================");
                         break;
                     case 4: // Filtro por ciudad LP
-                        List<Operacion> resultado = filtrarOperacionesPorOrigenYDestino();
+                        Console.WriteLine("===========LISTADO DE OPERACIONES ==========================");
+                        foreach (var OperacionActual in Operaciones)
+                        {
+                            Console.WriteLine(OperacionActual);
+                        }
+                        Console.WriteLine("==================================================================");
+
+                        Console.WriteLine("Seleccione el ID de la Operacion a la que pertencera la Orden de Carga");
+                        string origen, destino;
+                        Console.WriteLine("Introduzca el Origen");
+                        origen = Console.ReadLine();
+                        Console.WriteLine("Introduzca el Destino");
+                        destino = Console.ReadLine();
+                        List<Operacion> resultado = filtrarOperacionesPorOrigenYDestino(origen, destino);
                         foreach (var OperacionActual in resultado)
                         {
                             Console.WriteLine(OperacionActual);
                         }
                         break;
                     case 5: // Eliminar Operacion con ID =1 
-                        eliminarOperacionPorId();
+                        Console.WriteLine("===========LISTADO DE OPERACIONES ==========================");
+                        foreach (var OperacionActual in Operaciones)
+                        {
+                            Console.WriteLine(OperacionActual);
+                        }
+                        Console.WriteLine("==================================================================");
+
+                        Console.WriteLine("Seleccione el ID de la Operacion que desee eliminar");
+                        int idEliminar;
+
+                        idEliminar = Convert.ToInt32(Console.ReadLine());
+                        eliminarOperacionPorId(idEliminar);
+                        break;
+
+                    case 6: // Listar las ordenes de carga
+                        Console.WriteLine("===========LISTADO DE ORDENES DE CARGA ==========================");
+                        foreach (var ordenCarga in OrdenesCarga)
+                        {
+                            Console.WriteLine(ordenCarga);
+                        }
+                        Console.WriteLine("==================================================================");
+                        break;
+
+                    case 7:
+                        Console.WriteLine("===========LISTADO DE ORDENES DE CARGA (CON OPERACION) ==========================");
+                        // List<Operacion> o List<OrdenCarga>???
+                        // DATOS A MOSTRAR  Op:
+                        //              IdOperacion, Nombre, FleteTotal, Empresa
+                        // DATOS A MOSTRAR  Oc:
+                        //              IdOrdenCarga, Honorarios, Chofer
+                        var listaCustomizadaOC = listarOrdenesDeCargaConRelaciones();
+                        foreach (var ocPersonalizado in listaCustomizadaOC)
+                        {
+                            Console.WriteLine(ocPersonalizado);
+                        }
+                        Console.WriteLine("==================================================================");
+                        break;
+
+
+                    case 8: // Obtener Orden de Carga Personalizada por Identificador
+                        Console.Write("Seleccione el ID de la Orden de carga que desea visualizar: ");
+                        int idOc;
+                        idOc = Convert.ToInt32(Console.ReadLine());
+
+                        OrdenCargaDTO ordenCargaEncontrada = buscarOrdenCargaPersonalizadoPorId(idOc);
+
+                        if (ordenCargaEncontrada != null)
+                        { // si existe
+                            Console.WriteLine(ordenCargaEncontrada);
+                        }
+                        else
+                        {
+                            Console.WriteLine("La Orden de Carga de ID =" + idOc + " no existe en la base de datos");
+                        }
+
+                        break;
+
+                    /*
+                     * Trabajar con el mismo objeto creado en clase OrdenCargaDTO y realizar la siguiente consulta:
+                     * Obtener las ordenes de carga filtradas por Nombre de chofer, FleteTotal y empresa (excluyentes)
+                     */
+                    case 9: // 
+                        break;
+
+                     /*
+                     * Trabajar con un nuevo DTO personalizado (a criterio propio), construido en base a las clases: Operacion y OrdenCarga
+                     * Obtener el listado de los N primeros elementos (N parametrizado por consola) 
+                     */
+                    case 10:
                         break;
 
                     default:
@@ -157,12 +249,7 @@ namespace Test01_Introduccion_Cognos
 
 
 
-                /*var x = from example in Operaciones
-                        join example2 in OrdenesCarga
-                            on example.IdOperacion equals example2.IdOperacion
-                        select new { a = example.IdOperacion, example2.FechaInicio };
 
-                     var t=   x.Select(x => x.FechaInicio).ToList();*/
 
 
             } while (opciones != 0);
@@ -175,15 +262,63 @@ namespace Test01_Introduccion_Cognos
              *      3 => Listar Operacion 
              *      0 => Salir de la aplicacion
              */
+        }
 
 
+
+
+        private static OrdenCargaDTO buscarOrdenCargaPersonalizadoPorId(int idOc)
+        {
+            var tuplas = from op in Operaciones
+                         join oc in OrdenesCarga
+                             on op.IdOperacion equals oc.IdOperacion
+                         where oc.IdOrdenCarga == idOc
+                         select new OrdenCargaDTO
+                         {
+                             IdOperacion = op.IdOperacion,
+                             Operacion = op.Nombre,
+                             Flete = op.FleteTotal,
+                             Empresa = op.Empresa,
+                             IdOrdenCarga = oc.IdOrdenCarga,
+                             Honorarios = oc.Honorarios,
+                             NombreChofer = oc.Chofer
+                         };
+
+            return tuplas.ToList().FirstOrDefault();
+        }
+
+        static List<OrdenCargaDTO> listarOrdenesDeCargaConRelaciones()
+        {
+
+            /**
+             * SELECT *
+             * FROM Operacion op
+             * INNER JOIN OrdenCarga oc
+             * ON op.IdOperacion = oc.IdOperacion
+             *
+             */
+            var tuplas = from op in Operaciones
+                         join oc in OrdenesCarga
+                             on op.IdOperacion equals oc.IdOperacion
+                         select new OrdenCargaDTO
+                         {
+                             IdOperacion = op.IdOperacion,
+                             Operacion = op.Nombre,
+                             Flete = op.FleteTotal,
+                             Empresa = op.Empresa,
+                             IdOrdenCarga = oc.IdOrdenCarga,
+                             Honorarios = oc.Honorarios,
+                             NombreChofer = oc.Chofer
+                         };
+
+            return tuplas.ToList();
+            //var t = tuplas.Select(x => x.FechaInicio).ToList();
         }
 
         // 1. Filtrar Los operaciones cuyo origen sea igual a LP ( Origen == "LP" y Destino == "SC")
-        static List<Operacion> filtrarOperacionesPorOrigenYDestino()
+        static List<Operacion> filtrarOperacionesPorOrigenYDestino(string origen, string destino)
         {
-            return Operaciones.Where((op) => op.Origen == "LP" && op.Destino == "SC").ToList();
-
+            return Operaciones.Where((op) => op.Origen == origen && op.Destino == destino).ToList();
             /*List<Operacion> listaFiltrada = new List<Operacion>();
             for (int i = 0; i < Operaciones.Count; i++)
             {
@@ -198,28 +333,33 @@ namespace Test01_Introduccion_Cognos
 
 
         // 2. Eliminar las ordenes de cargo cuyo ID de Operacion sea Igual 1
-        static void eliminarOperacionPorId()
+        static void eliminarOperacionPorId(int ID)
         {
-            Operacion operacionBuscada = Operaciones.FirstOrDefault(x => x.IdOperacion == 1);
+            Operacion operacionBuscada = Operaciones.FirstOrDefault(x => x.IdOperacion == ID);
             if (operacionBuscada != null)
             { // si existe
-                Operaciones.Remove(operacionBuscada);
+                Operaciones.RemoveAll(op => op.IdOperacion == ID);
+                //Operaciones.Remove(operacionBuscada);
                 Console.WriteLine("Eliminacion exitosa");
             }
             else
             {
-                Console.WriteLine("La Operacion de ID = 1 no existe en la base de datos");
+                Console.WriteLine("La Operacion de ID =" + ID + " no existe en la base de datos");
             }
+            //return Operaciones.Where((op) => op.Origen == ID || op.Destino == destino).ToList();
         }
 
 
         // 3. Ordenar las operaciones por Nombre de Empresa 
+
+
         // 4. Obtener la primera opearcion cuyo criterio XXX se cumpla
 
 
 
         public static void CargarBaseDeDatosInicial()
         {
+            // listado de operaciones
             Operaciones.Add(new Operacion
             {
                 IdOperacion = IdActualOperacion++,
@@ -256,6 +396,8 @@ namespace Test01_Introduccion_Cognos
                 FleteTotal = 1000,
             });
 
+
+            // listado de ordenes de carga
             OrdenesCarga.Add(new OrdenCarga
             {
                 IdOrdenCarga = IdActualOrdenCarga++,
@@ -264,6 +406,16 @@ namespace Test01_Introduccion_Cognos
                 Chofer = "juan",
                 Honorarios = 21313,
                 IdOperacion = 1
+            });
+
+            OrdenesCarga.Add(new OrdenCarga
+            {
+                IdOrdenCarga = IdActualOrdenCarga++,
+                FechaInicio = "057897",
+                FechaFin = "979425",
+                Chofer = "martin",
+                Honorarios = 90000,
+                IdOperacion = 3
             }); ;
 
         }
