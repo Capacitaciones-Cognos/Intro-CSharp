@@ -48,7 +48,7 @@ namespace Test01_Introduccion_Cognos
 
             do
             {
-                Console.WriteLine("Seleccione una de las siguiente opciones:\n\n1 => Registrar Operacion\n2 => Registrar Orden de Carga \n3 => Listar Operacion \n4 => Filtrar OPE por Ciudad Destino y Origen \n5 => Eliminar Operacion con ID \n6 => Listar las ordenes de carga \n7 => Consulta: Listar Ordenes de Carga junto con la Operacion a la que pertenece \n8 Obtener Orden de Carga Personalizada por ID \n0 => Salir de la aplicacion");
+                Console.WriteLine("Seleccione una de las siguiente opciones:\n\n1 => Registrar Operacion\n2 => Registrar Orden de Carga \n3 => Listar Operacion \n4 => Filtrar OPE por Ciudad Destino y Origen \n5 => Eliminar Operacion con ID \n6 => Listar las ordenes de carga \n7 => Consulta: Listar Ordenes de Carga junto con la Operacion a la que pertenece \n8 Obtener Orden de Carga Personalizada por ID \n9=>Filtro por Nombre de chofer, FleteTotal y empresa \n10=>Filtro por operacion y numero de elementos\n0 => Salir de la aplicacion");
 
                 opciones = Convert.ToInt32(Console.ReadLine());
 
@@ -233,13 +233,47 @@ namespace Test01_Introduccion_Cognos
                      * Obtener las ordenes de carga filtradas por Nombre de chofer, FleteTotal y empresa (excluyentes)
                      */
                     case 9: // 
+                        string chofer,empresa;
+                        double fleteTotal;
+                        Console.Write("Introduzca el nombre del chofer: ");
+                        chofer = Console.ReadLine();
+                        Console.Write("Introduzca el nombre de la empresa: ");
+                        empresa = Console.ReadLine();
+                        Console.Write("Introduzca el monto del Flete: ");
+                        //fleteTotal = Convert.ToDouble(Console.ReadLine());
+                        bool conversionFlete = double.TryParse(Console.ReadLine(), out fleteTotal);
+                        if (conversionFlete==false)
+                        {
+                            fleteTotal = -100;
+                        }
+                        var listaOcporOp = buscarOcporChoferFleteEmpresa(chofer, fleteTotal, empresa);
+                        Console.WriteLine("===========LISTADO DE ORDENES DE CARGA DE LA OPERACION CON LOS DATOS: CHOFER: "+ chofer+ " FLETETOTAL: "+ fleteTotal+ " EMPRESA: "+empresa +" ===========================");
+                        foreach (var ocPersonalizado in listaOcporOp)
+                        {
+                            Console.WriteLine(ocPersonalizado);
+                        }
+                        Console.WriteLine("==================================================================");
                         break;
+                       
 
                      /*
                      * Trabajar con un nuevo DTO personalizado (a criterio propio), construido en base a las clases: Operacion y OrdenCarga
                      * Obtener el listado de los N primeros elementos (N parametrizado por consola) 
                      */
                     case 10:
+                        Console.Write("Seleccione el ID de la Operacion para ver sus Ordenes de Carga: ");
+                        int idOp;
+                        idOp = Convert.ToInt32(Console.ReadLine());
+                        Console.Write("Seleccione la cantidad de elementos a visualizar: ");
+                        int cantidadElementos;
+                        cantidadElementos = Convert.ToInt32(Console.ReadLine());
+                        var listaTarea = ordenesdeCargaPorOperacion(idOp, cantidadElementos);
+                        Console.WriteLine("===========LISTADO DE ORDENES DE CARGA DE LA OPERACION: idOp ===========================");
+                        foreach (var ocPersonalizado in listaTarea)
+                        {
+                            Console.WriteLine(ocPersonalizado);
+                        }
+                        Console.WriteLine("==================================================================");
                         break;
 
                     default:
@@ -285,8 +319,107 @@ namespace Test01_Introduccion_Cognos
                          };
 
             return tuplas.ToList().FirstOrDefault();
+            
         }
-
+      
+        static List<OrdenCargaDTO> buscarOcporChoferFleteEmpresa(string chofer, double? flete, string empresa)
+        {
+            
+            if (string.IsNullOrEmpty(empresa))
+            {
+                if (flete == -100)
+                {
+                    var tuplas = from op in Operaciones
+                                 join oc in OrdenesCarga
+                                 on op.IdOperacion equals oc.IdOperacion
+                                 where oc.Chofer == chofer 
+                                 select new OrdenCargaDTO
+                                 {
+                                     IdOperacion = op.IdOperacion,
+                                     IdOrdenCarga = oc.IdOrdenCarga,
+                                     Operacion = op.Nombre,
+                                     Flete = op.FleteTotal,
+                                     Empresa = op.Empresa,
+                                     Honorarios = oc.Honorarios,
+                                     NombreChofer = oc.Chofer
+                                 };
+                    return tuplas.ToList();
+                }
+                else 
+                {
+                    var tuplas = from op in Operaciones
+                                 join oc in OrdenesCarga
+                                 on op.IdOperacion equals oc.IdOperacion
+                                 where oc.Chofer == chofer  && op.FleteTotal == flete 
+                                 select new OrdenCargaDTO
+                                 {
+                                     IdOperacion = op.IdOperacion,
+                                     IdOrdenCarga = oc.IdOrdenCarga,
+                                     Operacion = op.Nombre,
+                                     Flete = op.FleteTotal,
+                                     Empresa = op.Empresa,
+                                     Honorarios = oc.Honorarios,
+                                     NombreChofer = oc.Chofer
+                                 };
+                    return tuplas.ToList();
+                }
+                
+            }else if(flete == -100)
+            {
+                var tuplas = from op in Operaciones
+                             join oc in OrdenesCarga
+                             on op.IdOperacion equals oc.IdOperacion
+                             where oc.Chofer == chofer  && op.Empresa == empresa
+                             select new OrdenCargaDTO
+                             {
+                                 IdOperacion = op.IdOperacion,
+                                 IdOrdenCarga = oc.IdOrdenCarga,
+                                 Operacion = op.Nombre,
+                                 Flete = op.FleteTotal,
+                                 Empresa = op.Empresa,
+                                 Honorarios = oc.Honorarios,
+                                 NombreChofer = oc.Chofer
+                             };
+                return tuplas.ToList();
+            }
+            else
+            {
+                var tuplas = from op in Operaciones
+                            join oc in OrdenesCarga
+                            on op.IdOperacion equals oc.IdOperacion
+                            where oc.Chofer == chofer && op.FleteTotal == flete && op.Empresa == empresa
+                            select new OrdenCargaDTO
+                            {
+                                IdOperacion = op.IdOperacion,
+                                IdOrdenCarga = oc.IdOrdenCarga,
+                                Operacion = op.Nombre,
+                                Flete = op.FleteTotal,
+                                Empresa = op.Empresa,
+                                Honorarios = oc.Honorarios,
+                                NombreChofer = oc.Chofer
+                            };
+                return tuplas.ToList();
+            }
+        }
+        static List<OrdenCargaDTO> ordenesdeCargaPorOperacion(int idOp,int cantidadElementos)
+        {
+            var tuplas = from op in Operaciones
+                         join oc in OrdenesCarga
+                             on op.IdOperacion equals oc.IdOperacion
+                         where op.IdOperacion == idOp
+                         select new OrdenCargaDTO
+                         {
+                             IdOperacion = op.IdOperacion,
+                             IdOrdenCarga = oc.IdOrdenCarga,
+                             Operacion = op.Nombre,
+                             Flete = op.FleteTotal,
+                             Empresa = op.Empresa,                             
+                             Honorarios = oc.Honorarios,
+                             NombreChofer = oc.Chofer
+                         };
+            return tuplas.Take(cantidadElementos).ToList();
+           
+        }
         static List<OrdenCargaDTO> listarOrdenesDeCargaConRelaciones()
         {
 
@@ -415,7 +548,7 @@ namespace Test01_Introduccion_Cognos
                 FechaFin = "979425",
                 Chofer = "martin",
                 Honorarios = 90000,
-                IdOperacion = 3
+                IdOperacion = 1
             }); ;
 
         }
